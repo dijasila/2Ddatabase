@@ -1,0 +1,9 @@
+File structure for the database:
+
+data                       : Root dir for materials
+data/MATNAME               : Dir for material with name MATNAME
+data/MATNAME/relax_XC.traj : traj file from relaxation with XC functional
+data/MATNAME/relax_XC.gpw  : gpw file from relaxation with XC functional
+data/MATNAME/gs_XC.gpw     : gpw file from ground state calculation with XC functional
+
+So far so good - gonna update this file when more info is available
