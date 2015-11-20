@@ -6,7 +6,7 @@ data/MATNAME/relax_XC.traj : traj file from relaxation with XC functional
 data/MATNAME/relax_XC.gpw  : gpw file from relaxation with XC functional
 data/MATNAME/gs_XC.gpw     : gpw file from ground state calculation with XC functional
 
-data/metals		   : Dir with magnetic materials that are omitted so 
+data/metals		   : Dir with metallic materials that are omitted so 
 			     far
 			   
 
