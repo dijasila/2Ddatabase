@@ -1,0 +1,7 @@
+BaBr2
+BaCl2
+BaI2
+FeBr2
+GeCl2
+PbBr2
+SnBr2
