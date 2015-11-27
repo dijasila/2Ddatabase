@@ -39,6 +39,8 @@ OPTIONS:
 -s: Force calculation to be spin-polarized.
 -n: Use non-symmorphic symmetries - for testing only.
 """
+root = '/home/niflheim2/kiran/2ddatabase/'
+
 parser = OptionParser()
 parser.add_option('-k', '--nk', type='string', dest='nk')
 parser.add_option('-x', '--xc', type='string', dest='xc')
@@ -53,7 +55,7 @@ opts, args = parser.parse_args()
 
 name = args[0]
 atomsfile = args[1]
-filename = '%s_%s_gs' % (name, xc)
+filename = '%s_gs' % (xc) # name gs ####
 if opts.nk:
     nks = [int(nk) for nk in opts.nk.split(',')]
     if len(nks) > 1:
@@ -144,12 +146,21 @@ atoms.set_calculator(calc)
 
 atoms.center(vacuum=0.5 * vacuum, axis=2)
 E0 = atoms.get_potential_energy()
+
+### Check magnetic moment
+maxmagmom = max(np.abs(atoms.get_magnetic_moments()))
+print('%s, max magmom=%s' % (name, maxmagmom))
+if maxmagmom > 0.01:
+    print('magnetic!' % (name, maxmagmom))
+    fdmagnetic = open(root + 'magneticlist.txt', 'w')
+    print(name, file=fdmagnetic) 
 Vvac0 = get_vacuum_level(calc) # Get the Hartree potential in vacuum
 ef0 = calc.get_fermi_level() - Vvac0 # Absolute Fermi level
 bandgap0, k1, k2 = get_band_gap(calc, output=None)
 
 # If vacuum is not set, increase vacuum until the Fermi level and band gap are
 # converged. This should ensure smallest possible unit cell.
+
 while converge_vacuum:
     vacuum += 1.0
     atoms.center(vacuum=0.5 * vacuum, axis=2)
@@ -157,6 +168,7 @@ while converge_vacuum:
     Vvac = get_vacuum_level(calc)
     ef = calc.get_fermi_level() - Vvac
     bandgap, k1, k2 = get_band_gap(calc, output=None)
+    diff = bandgap - bandgap0
     parprint('vacuum=%s, Epot change=%s, Ef change=%s, band gap change=%s' %
              (vacuum, abs(E - E0), abs(ef - ef0), diff))
     if abs(E - E0) < 0.01 and abs(ef - ef0) < 0.01 and abs(diff) < 0.01:

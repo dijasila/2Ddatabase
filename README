@@ -6,4 +6,11 @@ data/MATNAME/relax_XC.traj : traj file from relaxation with XC functional
 data/MATNAME/relax_XC.gpw  : gpw file from relaxation with XC functional
 data/MATNAME/gs_XC.gpw     : gpw file from ground state calculation with XC functional
 
+data/metals		   : Dir with metallic materials that are omitted so 
+			     far
+			   
+
+Structure files from Mohnish is in directory
+	  	     	   : /home/niflheim2/mohpa/2D_Halides/MX2/Monolayer/
+
 So far so good - gonna update this file when more info is available
