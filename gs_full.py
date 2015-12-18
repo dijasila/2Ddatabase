@@ -3,9 +3,11 @@ from math import pi
 import numpy as np
 from optparse import OptionParser
 from ase.units import Hartree, Bohr
+from ase.io import read
 from gpaw import GPAW
 
 nbecut = None
+spinpol=False
 
 parser = OptionParser()
 parser.add_option('-b', '--nbecut', type='float', dest='nbecut')
@@ -22,8 +24,9 @@ if opts.nbecut:
 
 filename = '.'.join(os.path.basename(gsfile).split('.')[:-1])
 
-calc = GPAW(gsfile, h=0.15, fixdensity=True,
+calc = GPAW(gsfile, h=0.15, fixdensity=True, 
             txt=filename + '_full.txt',
+            spinpol=spinpol,
             parallel={'band': 1},
             symmetry={'point_group': True, 'time_reversal': True,
                       'symmorphic': not opts.non_symmorphic})
@@ -52,5 +55,7 @@ scalapack = None
 if opts.scalapack:
     scalapack = opts.scalapack
 
-calc.diagonalize_full_hamiltonian(nbands=nbands, scalapack=scalapack)
+calc.diagonalize_full_hamiltonian(nbands=nbands, scalapack=scalapack, 
+                                  expert=True)
+
 calc.write(filename + '_full.gpw', mode='all')

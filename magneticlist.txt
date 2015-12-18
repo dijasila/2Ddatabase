@@ -2,6 +2,8 @@ BaBr2
 BaCl2
 BaI2
 FeBr2
+FeCl2
+FeI2	
 GeCl2
 PbBr2
 SnBr2

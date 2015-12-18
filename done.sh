@@ -3,7 +3,6 @@
 
 # check if calc is done
 
-
 names=$(<structures.txt)
 > doneGsFull.txt 
 for name in $names;

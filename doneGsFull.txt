@@ -1,3 +1,4 @@
+CaBr2
 CaCl2
 CaI2
 CdBr2
@@ -11,9 +12,15 @@ MgBr2
 MgCl2
 MgI2
 PdBr2
+PdCl2
 PdI2
 PtBr2
+PtCl2
+PtI2
+SnCl2
+SrBr2
 SrCl2
+SrI2
 ZnBr2
 ZnCl2
 ZnI2

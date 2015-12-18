@@ -1,8 +1,10 @@
+from __future__ import print_function
 import os
 import ase.db
 import ase.io
 import subprocess
-from materials import honeycombs, hexenes, hexanes, specials, icsds
+import numpy as np
+#from materials import honeycombs, hexenes, hexanes, specials, icsds
 
 nkx0 = 18
 nky0 = 18
@@ -14,21 +16,25 @@ nbecut = 150
 non_symmorphic = False
 scalapack = True
 
-queue = 'verylong'
-nodes = 4
-ppn = 8
-cpu = 'xeon8'
+queue = 'long'
+nodes = 1
+ppn = 16
+cpu = 'xeon16' #'xeon8'
 
 root = '/home/niflheim2/kiran/2ddatabase/'
 
 script = root + 'gs_full.py'
 names = np.loadtxt(root + 'structures.txt', dtype=str)
-
-todo = names[:1] 
+magnetic = list(np.loadtxt(root + 'magneticlist.txt', dtype=str))
+metallic = list(np.loadtxt(root + 'metalliclist.txt', dtype=str))
+done = list(np.loadtxt(root + 'doneGsFull.txt', dtype=str))
+names = [x for x in names if x not in magnetic and x not in metallic
+         and x not in done]
 
 #db = ase.db.connect(root + '2ddb.db')
 #for row in db.select(relaxed=True):
-for name in todo:
+
+for name in names[:]:
     #print('%s, nks=%s, has_gs=%s' % (row.name, row.relax_nks, row.has_gs))
     #name = row.name
     #if name not in todo:
@@ -38,14 +44,20 @@ for name in todo:
     #nky = nks[1]
     #nkx = 18
     #nky = 18
-    
-    mydir0 = root + '%s/' % (name)
-    gsfile = mydir0 + '%s_gs.gpw' % (xc)
+    print(name)
+    mydir = root + 'data/%s/' % (name)
+    gsfile = mydir + '%s_gs.gpw' % (xc)
+    gsfullfile = mydir + '%s_gs_full.gpw' % (xc)
+
     if not os.path.isfile(gsfile):
         print('Does not have gs .gpw file for %s' % name)
         continue
+    
+    if os.path.isfile(gsfullfile):
+        print('full gs .gpw file already done!')
+        continue
 
-    mydir = root + '%s/' % (name)
+    #mydir = mydir0 #root + 'data/%s/' % (name)
     if not os.path.isdir(mydir):
         os.makedirs(mydir)
 
@@ -66,6 +78,6 @@ for name in todo:
     cmd += ' %s %s' % (job, gsfile)
     
     os.chdir(mydir)
-    
-    sp = subprocess.Popen(['/bin/bash', '-i', '-c', cmd])
-    sp.communicate()
+    sp = subprocess.call(cmd, shell=True)
+#    sp = subprocess.Popen(['/bin/bash', '-i', '-c', cmd])
+#    sp.communicate()

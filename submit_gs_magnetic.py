@@ -10,7 +10,7 @@ from gpaw import GPAW, restart
 #from materials import honeycombs, hexenes, hexanes, icsds, specials
 
 xc = 'PBE'
-ecut = 600 
+ecut = 600
 vacuum = 15
 non_symmorphic = False
 
@@ -20,7 +20,7 @@ N0gs = 24
 l0 = 1. / a0
 tol = 0.01
 
-queue = 'long'
+queue = 'verylong'
 nodes = 2
 ppn = 4
 cpu = 'opteron4'
@@ -32,20 +32,21 @@ script = root + 'gs.py'
 names = list(np.loadtxt(root + 'structures.txt', dtype=str))
 magnetic = list(np.loadtxt(root + 'magneticlist.txt', dtype=str))
 metallic = list(np.loadtxt(root + 'metalliclist.txt', dtype=str))
-done=[]
+done = ['ZnBr2']
 
 names = [x for x in names if x not in magnetic and x not in metallic and x not in done]
 
+
 #db = ase.db.connect(root + '2ddb.db')
+
 #for row in db.select():
 #    if not row.name in names:
 #        names.append(row.name)
-
 nkmin = 6
 fdmetallic = open('metalliclist.txt', 'a')
 fdmagnetic=open('magneticlist.txt', 'a')
 
-for n, name in enumerate(names):
+for n, name in enumerate(magnetic):
     #rows = list(db.select(name=name))
     #if len(rows) > 0:
     #    row = rows[0]
@@ -54,33 +55,26 @@ for n, name in enumerate(names):
     
     #atoms = row.toatoms() 
     print(name + ':' )
-    spinpol=False
+    spinpol=True
     relaxdir = relaxroot + name
     relaxtraj = relaxdir + '/%s.traj' % name
     relaxgpw = relaxdir + '/%s.gpw' % name
 
-    gsdir = root + 'data/%s/' % (name)
+    gsdir = root + 'data/magnetic/%s/' % (name)
     gsgpw = gsdir + 'PBE_gs.gpw'
     gstraj = gsdir + 'PBE_gs.traj'
     gsgpwspinpol = gsdir + 'PBE_gs_spinpol.gpw'
     gstrajspinpol = gsdir + 'PBE_gs_spinpol.traj'
     
-    #os.rename(gsgpw, gsgpwspinpol)
-    #os.rename(gstraj, gstrajspinpol)
-    if os.path.isfile(gsgpw):
-        os.remove(gsgpw)
-        os.remove(gstraj)
-
     if os.path.isfile(gsgpw):
         print('    has gs')
         calc =  GPAW(relaxgpw, xc='PBE', txt=None)
         atoms = ase.io.read(gstraj)
         maxmagmom = max(np.abs(atoms.get_magnetic_moments()))
         print('    max magmom = %1.2f' % (maxmagmom))
-        if maxmagmom > 0.01: # check if magnetic
-            print('    %s is magnetic!' % name)
-            print(name, file=fdmagnetic) 
-            os.rename(gsdir, root + 'data/magnetic/' + name)
+        if maxmagmom < 0.01: # check if magnetic
+            print('    %s is not magnetic!' % name)
+            os.rename(gsdir, root + 'data/' + name)
 
         # Check band gap:
         bandgap = get_band_gap(calc, output=None)
@@ -89,6 +83,14 @@ for n, name in enumerate(names):
             print('    %s is metallic!' % name)
             print(name, file=fdmetallic)
             os.rename(gsdir, root + 'data/metallic/' + name)
+
+        """
+        os.rename(gsgpw, gsgpwspinpol)
+        os.rename(gstraj, gstrajspinpol)
+        if os.path.isfile(gsdir + 'PBE_gs0.gpw'):
+            os.remove(gsdir + 'PBE_gs0.gpw')
+            os.remove(gsdir + 'PBE_gs0.traj')
+        """
         continue
     
     if os.path.isfile(relaxtraj):
@@ -134,7 +136,7 @@ for n, name in enumerate(names):
     job += ' -k %d,%d' % (nkx_gs, nky_gs)
     job += ' -x %s' % xc
     job += ' -c %s' % ecut
-    #job += ' -v %s' % vacuum
+    job += ' -v %s' % vacuum
 
     if spinpol:
         job += ' -s'

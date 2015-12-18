@@ -12,7 +12,7 @@ from gpaw.mpi import serial_comm
 from gpaw.response.qp import GWQuasiParticleCalculator
 from gpaw.response.selfenergy import QuadQPointIntegration
 from band_structure import get_homo_lumo_states
-from qpt_grids import two_density_grid_2d, voronoi_cell_weights_2d
+#from qpt_grids import two_density_grid_2d, voronoi_cell_weights_2d
 
 parser = OptionParser()
 parser.add_option('-c', '--ecut', type='float', dest='ecut', default=50.)
@@ -41,8 +41,8 @@ atoms = calc.get_atoms()
 xc = calc.get_xc_functional()
 ibzk_kc = calc.get_ibz_k_points()
 
-filename = '%s_%s_g0w0' % (name, xc)
-filename += opts.suffix
+filename = '%s_g0w0' % (xc)
+#filename += opts.suffix
 
 homo, lumo = get_homo_lumo_states(calc)
 
@@ -52,7 +52,6 @@ ncb = lumo[3]
 na = max(0, nvb - 4)
 nb = ncb + 5
 bandrange = (na, nb)
-
 
 kd = calc.wfs.kd
 
@@ -71,19 +70,21 @@ b2 = np.linalg.norm(rcell_cv[1])
 frad = opts.rad * min(b1, b2)
 cgrid = opts.cgrid
 
-grid_qpts = two_density_grid_2d(qd, rcell_cv, cgrid, frad)
+#grid_qpts = two_density_grid_2d(qd, rcell_cv, cgrid, frad)
 
-gridq_qc = bzq_qc[grid_qpts]
-gridq_qv = bzq_qv[grid_qpts]
+#gridq_qc = bzq_qc[grid_qpts]
+#gridq_qv = bzq_qv[grid_qpts]
 
-Nqpts = np.prod(qd.N_c)
-fweight = 1. / np.prod(qd.N_c[0:2])
-cweight = 1. / np.prod(1.0 * qd.N_c[0:2] / cgrid)
-weights_q = voronoi_cell_weights_2d(gridq_qv, rcell_cv, cweight)
+#Nqpts = np.prod(qd.N_c)
+#fweight = 1. / np.prod(qd.N_c[0:2])
+#cweight = 1. / np.prod(1.0 * qd.N_c[0:2] / cgrid)
+#weights_q = voronoi_cell_weights_2d(gridq_qv, rcell_cv, cweight)
 
-anisotropic = not opts.iso
-qptint = QuadQPointIntegration(qd, cell_cv, gridq_qc, weight_q=weights_q,
-                               anisotropic=anisotropic)
+#anisotropic = not opts.iso
+
+#vol = atoms.get_volume() / Bohr**3
+#nbands = int(vol * (ecut / Hartree)**1.5 * 2**0.5 / 3 / pi**2)
+#nbands += nbands % 2
 
 qpcalc = GWQuasiParticleCalculator(calc=calc,
                                    filename=filename,
@@ -92,11 +93,11 @@ qpcalc = GWQuasiParticleCalculator(calc=calc,
                                    savechi0=False,
                                    savepair=False,
                                    bandrange=bandrange,
+                                   #nbands=nbands,
                                    ecut=ecut,
                                    domega0=0.1,
                                    omega2=15.,
                                    truncation='2D',
-                                   qptint=qptint,
                                    nblocks=opts.nblocks)
 
 qpcalc.load_iteration()

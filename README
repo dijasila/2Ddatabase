@@ -2,12 +2,26 @@ File structure for the database:
 
 data                       : Root dir for materials
 data/MATNAME               : Dir for material with name MATNAME
-data/MATNAME/relax_XC.traj : traj file from relaxation with XC functional
-data/MATNAME/relax_XC.gpw  : gpw file from relaxation with XC functional
-data/MATNAME/gs_XC.gpw     : gpw file from ground state calculation with XC functional
+data/MATNAME/XC_gs.traj    : traj file from relaxation with XC functional
+data/MATNAME/XC_gs.gpw     : gpw file from ground state calculation with 
+			     XC functional
+data/MATNAME/XC_gs_full.gpw
+			   : gpw file from ground state calculation with XC 
+			     functional with more bands
+
+data/MATNAME/XC_gs_spinpol.gpw
+			   : gpw file from spin polarixedground state 
+			   calculation with XC functional.
+
+data/MATNAME/gw_ecutECUT   : Dir for G0W0 calculations with ecut=ECUT.
+
+data/MATNAME/chi0	   : Dir for chi0 data files.
 
 data/metals		   : Dir with metallic materials that are omitted so 
-			     far
+			     far.
+
+data/magnetic		   : Dir with magnetic materials that are omitted so 
+			     far.
 			   
 
 Structure files from Mohnish is in directory

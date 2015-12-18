@@ -35,3 +35,10 @@ WI2
 YBr2
 YCl2
 YI2
+GeI2
+PbCl2
+PbI2
+SnI2
+ZrBr2
+ZrCl2
+ZrI2

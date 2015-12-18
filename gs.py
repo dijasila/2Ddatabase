@@ -10,6 +10,7 @@ from ase.units import Hartree, Bohr
 from ase.dft.bandgap import get_band_gap
 from gpaw import GPAW, PW, FermiDirac
 from gpaw.symmetry import Symmetry
+from gpaw.occupations import *#get_homo_lumo
 from utils import get_vacuum_level
 
 nkx = 12
@@ -143,20 +144,14 @@ calc = GPAW(mode=PW(ecut),
             txt=filename + '.txt')
 atoms.set_calculator(calc)
 
-
 atoms.center(vacuum=0.5 * vacuum, axis=2)
-E0 = atoms.get_potential_energy()
 
-### Check magnetic moment
-maxmagmom = max(np.abs(atoms.get_magnetic_moments()))
-print('%s, max magmom=%s' % (name, maxmagmom))
-if maxmagmom > 0.01:
-    print('magnetic!' % (name, maxmagmom))
-    fdmagnetic = open(root + 'magneticlist.txt', 'w')
-    print(name, file=fdmagnetic) 
-Vvac0 = get_vacuum_level(calc) # Get the Hartree potential in vacuum
-ef0 = calc.get_fermi_level() - Vvac0 # Absolute Fermi level
-bandgap0, k1, k2 = get_band_gap(calc, output=None)
+if converge_vacuum:
+    E0 = atoms.get_potential_energy()
+    Vvac0 = get_vacuum_level(calc) # Get the Hartree potential in vacuum
+# ef0 = calc.get_fermi_level() - Vvac0 # Absolute Fermi level
+    valbandef0 = calc.get_homo_lumo()[0] - Vvac0 # Absolute valence band energy level
+    bandgap0, k1, k2 = get_band_gap(calc, output=None)
 
 # If vacuum is not set, increase vacuum until the Fermi level and band gap are
 # converged. This should ensure smallest possible unit cell.
@@ -166,17 +161,22 @@ while converge_vacuum:
     atoms.center(vacuum=0.5 * vacuum, axis=2)
     E = atoms.get_potential_energy()
     Vvac = get_vacuum_level(calc)
-    ef = calc.get_fermi_level() - Vvac
+    #ef = calc.get_fermi_level() - Vvac
+    valband = calc.get_homo_lumo()[0]
+    valbandef = valband - Vvac
     bandgap, k1, k2 = get_band_gap(calc, output=None)
     diff = bandgap - bandgap0
-    parprint('vacuum=%s, Epot change=%s, Ef change=%s, band gap change=%s' %
-             (vacuum, abs(E - E0), abs(ef - ef0), diff))
-    if abs(E - E0) < 0.01 and abs(ef - ef0) < 0.01 and abs(diff) < 0.01:
+    parprint('vacuum=%s, Valence band level=%s, Epot change=%s, Ef change=%s, band gap change=%s' %
+             (vacuum, valband, abs(E - E0), abs(valbandef - valbandef0), diff))
+    if abs(E - E0) < 0.01 and abs(valbandef - valbandef0) < 0.01 and abs(diff) < 0.01:
             converge_vacuum = False
 
     E0 = E
-    ef0 = ef
+    #ef0 = ef
+    valbandef0 = valbandef
     bandgap0 = bandgap
+    #calc.write(filename + '_vacuum_%s.gpw'%vacuum)
+    #ase.io.write(filename + '.traj', atoms)
 
 parprint('Using vacuum=%s, calculating forces' % vacuum)
 

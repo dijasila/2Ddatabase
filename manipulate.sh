@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# Make folders with structure names
+
+# check if calc is done
+
 
 names=$(<structures.txt)
 for name in $names;
 do
-    echo $name
-    mkdir $name
+    if  test -e "data/$name/"; then
+	mkdir "data/$name/chi0";
+    fi
 done
+
